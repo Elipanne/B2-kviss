@@ -1,20 +1,23 @@
 :root {
-  --bg: #f3efe5;
-  --card: #fffdf8;
-  --text: #26312f;
-  --muted: #6e7772;
-  --border: #d9d6ca;
-  --accent: #315f70;
-  --accent-dark: #234654;
-  --accent-soft: #e5eff0;
-  --forest: #476354;
-  --forest-soft: #e8eee8;
-  --warm-red: #8b4b43;
-  --success: #3f7656;
-  --success-soft: #e9f3eb;
-  --danger: #9a4b46;
-  --danger-soft: #f8ece9;
-  --shadow: 0 14px 34px rgba(47, 60, 55, 0.10);
+  --bg: #edf7fb;
+  --card: #ffffff;
+  --text: #21333b;
+  --muted: #647985;
+  --border: #cfe0e8;
+  --accent: #187aa5;
+  --accent-dark: #105b7b;
+  --accent-soft: #dff3fb;
+  --sky: #78c7e8;
+  --fjord: #2e8fb8;
+  --forest: #3f7d5c;
+  --forest-soft: #e4f2e9;
+  --warm-red: #c84452;
+  --red-soft: #fde9ec;
+  --success: #2f8055;
+  --success-soft: #e7f5ed;
+  --danger: #b33f49;
+  --danger-soft: #fdebed;
+  --shadow: 0 15px 36px rgba(28, 82, 104, 0.11);
   --radius: 18px;
 }
 
@@ -33,25 +36,26 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 15% 0%, rgba(71, 99, 84, 0.11), transparent 28rem),
-    radial-gradient(circle at 85% 8%, rgba(49, 95, 112, 0.10), transparent 28rem),
-    linear-gradient(180deg, #f7f3e9 0%, var(--bg) 42%, #eef0e8 100%);
+    radial-gradient(circle at 10% 4%, rgba(120, 199, 232, 0.24), transparent 25rem),
+    radial-gradient(circle at 90% 2%, rgba(200, 68, 82, 0.08), transparent 22rem),
+    linear-gradient(180deg, #f8fdff 0%, #eef8fc 48%, #f5fbf8 100%);
   position: relative;
   isolation: isolate;
 }
 
+/* Lett nasjonalromantisk bakgrunn: fjell, trær og fjord. */
 body::before {
   content: "";
   position: fixed;
   inset: 0 0 auto 0;
-  height: 265px;
+  height: 280px;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.17;
+  opacity: 0.22;
   background-repeat: no-repeat;
   background-position: top center;
-  background-size: min(1400px, 125vw) 265px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 265' preserveAspectRatio='none'%3E%3Cpath d='M0 205 L125 118 L210 180 L320 82 L430 192 L555 112 L665 201 L790 72 L930 190 L1040 118 L1165 203 L1280 108 L1400 190 L1400 265 L0 265 Z' fill='%23536f62'/%3E%3Cpath d='M0 224 L165 157 L280 211 L420 138 L560 218 L730 148 L870 220 L1035 154 L1175 218 L1400 164 L1400 265 L0 265 Z' fill='%236f8b8f'/%3E%3Cpath d='M0 232 C160 216 270 250 430 230 C590 210 700 252 860 230 C1020 208 1160 248 1400 222' fill='none' stroke='%23315f70' stroke-width='5' stroke-linecap='round' opacity='.75'/%3E%3C/svg%3E");
+  background-size: min(1450px, 130vw) 280px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1450 280' preserveAspectRatio='none'%3E%3Cpath d='M0 205 L115 130 L190 179 L315 78 L430 188 L540 115 L645 198 L775 70 L910 187 L1025 116 L1150 199 L1270 103 L1450 192 L1450 280 L0 280 Z' fill='%2378c7e8'/%3E%3Cpath d='M0 223 L155 164 L272 213 L420 139 L565 220 L730 151 L875 221 L1045 155 L1185 218 L1450 165 L1450 280 L0 280 Z' fill='%2369a985'/%3E%3Cpath d='M0 236 C165 216 280 255 440 232 C600 210 715 255 875 231 C1035 207 1180 251 1450 224 L1450 280 L0 280 Z' fill='%232e8fb8' opacity='.72'/%3E%3Cg fill='%233f7d5c'%3E%3Cpath d='M112 196 l12-25 12 25h-8v20h-8v-20z'/%3E%3Cpath d='M1230 187 l13-28 13 28h-8v21h-10v-21z'/%3E%3Cpath d='M1320 199 l10-22 10 22h-6v17h-8v-17z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 button,
@@ -84,24 +88,24 @@ button {
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--warm-red);
-  color: #fffaf0;
+  color: #fff;
   font-size: 0.86rem;
-  border: 2px solid rgba(255, 253, 248, 0.92);
+  border: 3px solid #fff;
   box-shadow:
-    0 0 0 2px rgba(139, 75, 67, 0.45),
-    0 4px 12px rgba(63, 53, 45, 0.14);
+    0 0 0 2px rgba(200, 68, 82, 0.32),
+    0 5px 13px rgba(28, 82, 104, 0.14);
 }
 
 .romantic-tagline {
-  color: var(--forest);
+  color: var(--accent-dark);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.93rem;
+  font-size: 0.94rem;
   font-style: italic;
   letter-spacing: 0.035em;
   white-space: nowrap;
@@ -114,8 +118,8 @@ main {
 }
 
 .card {
-  background: rgba(255, 253, 248, 0.96);
-  border: 1px solid rgba(217, 214, 202, 0.92);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(207, 224, 232, 0.95);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   backdrop-filter: blur(3px);
@@ -132,18 +136,35 @@ main {
   overflow: hidden;
 }
 
-.hero::after {
+/* Blå, hvite og røde blomster med litt grønt – diskret, ikke bunadseksplosjon. */
+.hero::before {
   content: "";
   position: absolute;
-  right: 24px;
-  bottom: 18px;
-  width: 110px;
-  height: 56px;
-  opacity: 0.12;
+  right: 18px;
+  top: 14px;
+  width: 150px;
+  height: 95px;
+  opacity: 0.72;
+  pointer-events: none;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 80'%3E%3Cpath d='M2 62 L35 25 L59 52 L84 17 L118 57 L142 35 L158 62' fill='none' stroke='%23476354' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M18 69 C43 62 55 76 80 69 C105 62 117 76 142 69' fill='none' stroke='%23315f70' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 110'%3E%3Cg fill='none' stroke='%233f7d5c' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M33 102 C42 78 50 55 60 32'/%3E%3Cpath d='M84 102 C80 76 86 55 101 31'/%3E%3Cpath d='M130 103 C125 78 132 61 145 44'/%3E%3Cpath d='M53 62 C42 59 35 61 28 68'/%3E%3Cpath d='M91 67 C103 63 111 65 118 72'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='62' cy='29' r='13' fill='%23ffffff' stroke='%23187aa5' stroke-width='3'/%3E%3Ccircle cx='62' cy='29' r='4' fill='%23c84452'/%3E%3Ccircle cx='102' cy='29' r='12' fill='%23c84452'/%3E%3Ccircle cx='102' cy='29' r='4' fill='%23ffffff'/%3E%3Ccircle cx='146' cy='42' r='12' fill='%23187aa5'/%3E%3Ccircle cx='146' cy='42' r='4' fill='%23ffffff'/%3E%3Ccircle cx='30' cy='70' r='8' fill='%2378c7e8'/%3E%3Ccircle cx='30' cy='70' r='3' fill='%23ffffff'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  right: 26px;
+  bottom: 16px;
+  width: 120px;
+  height: 58px;
+  opacity: 0.23;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 80'%3E%3Cpath d='M2 60 L34 26 L58 50 L83 16 L118 56 L143 34 L168 60' fill='none' stroke='%233f7d5c' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 69 C39 61 53 76 80 68 C106 61 121 76 154 67' fill='none' stroke='%23187aa5' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .hero h1,
@@ -160,6 +181,16 @@ main {
   line-height: 1;
 }
 
+.hero h1,
+.hero .lead,
+.hero .round-summary,
+.hero .muted,
+.hero .primary-button,
+.hero .eyebrow {
+  position: relative;
+  z-index: 1;
+}
+
 .eyebrow {
   margin: 0 0 10px;
   text-transform: uppercase;
@@ -173,7 +204,7 @@ main {
   margin: 18px 0 0;
   font-size: clamp(1.05rem, 2.5vw, 1.28rem);
   line-height: 1.55;
-  color: #3e4a46;
+  color: #38515d;
 }
 
 .muted {
@@ -184,8 +215,8 @@ main {
   margin: 28px 0 10px;
   padding: 18px 20px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent-soft), var(--forest-soft));
-  border: 1px solid rgba(71, 99, 84, 0.10);
+  background: linear-gradient(135deg, var(--accent-soft), #f4fbff 55%, var(--forest-soft));
+  border: 1px solid rgba(24, 122, 165, 0.12);
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -194,33 +225,34 @@ main {
 
 .round-summary strong {
   font-size: 1.1rem;
+  color: var(--accent-dark);
 }
 
 .round-summary span {
-  color: #465a55;
+  color: #496471;
 }
 
 .primary-button {
   margin-top: 28px;
   border: 0;
   border-radius: 12px;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--fjord));
   color: #fff;
   padding: 14px 20px;
   font-weight: 750;
   cursor: pointer;
   transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
-  box-shadow: 0 8px 16px rgba(49, 95, 112, 0.20);
+  box-shadow: 0 8px 18px rgba(24, 122, 165, 0.22);
 }
 
 .primary-button:hover {
-  background: var(--accent-dark);
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
   transform: translateY(-1px);
 }
 
 .primary-button:focus-visible,
 .option-button:focus-visible {
-  outline: 3px solid rgba(49, 95, 112, 0.28);
+  outline: 3px solid rgba(24, 122, 165, 0.28);
   outline-offset: 3px;
 }
 
@@ -242,11 +274,11 @@ main {
   min-height: 32px;
   padding: 6px 11px;
   border-radius: 999px;
-  background: var(--forest-soft);
-  color: #355043;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
   font-weight: 750;
   font-size: 0.9rem;
-  border: 1px solid rgba(71, 99, 84, 0.12);
+  border: 1px solid rgba(24, 122, 165, 0.13);
 }
 
 .counter {
@@ -259,7 +291,7 @@ main {
 .mini-track {
   width: 100%;
   overflow: hidden;
-  background: #dedfd8;
+  background: #dbeaf0;
   border-radius: 999px;
 }
 
@@ -270,7 +302,7 @@ main {
 .progress-fill,
 .mini-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--forest), var(--accent));
+  background: linear-gradient(90deg, var(--warm-red) 0 12%, var(--accent) 12% 72%, var(--forest) 72% 100%);
   border-radius: inherit;
   transition: width 220ms ease;
 }
@@ -278,30 +310,33 @@ main {
 .question-card {
   padding: clamp(24px, 5vw, 42px);
   position: relative;
+  overflow: hidden;
 }
 
+/* En liten blomst i hjørnet på oppgavekortet. */
 .question-card::before {
   content: "";
   position: absolute;
-  top: 18px;
-  right: 20px;
-  width: 44px;
-  height: 18px;
-  opacity: 0.13;
+  top: 15px;
+  right: 17px;
+  width: 54px;
+  height: 42px;
+  opacity: 0.42;
+  pointer-events: none;
   background-repeat: no-repeat;
   background-size: contain;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 36'%3E%3Cpath d='M2 20 C16 8 28 32 42 20 C56 8 68 32 86 17' fill='none' stroke='%23315f70' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 65 52'%3E%3Cpath d='M32 50 C31 34 35 24 43 13' fill='none' stroke='%233f7d5c' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='44' cy='12' r='10' fill='%23ffffff' stroke='%23187aa5' stroke-width='3'/%3E%3Ccircle cx='44' cy='12' r='3.5' fill='%23c84452'/%3E%3C/svg%3E");
 }
 
 .question-text {
   font-size: clamp(1.45rem, 4vw, 2.15rem);
   line-height: 1.24;
-  padding-right: 34px;
+  padding-right: 42px;
 }
 
 .instruction {
   margin: 14px 0 0;
-  color: #4c5752;
+  color: #49616c;
   font-size: 1.02rem;
 }
 
@@ -320,18 +355,19 @@ main {
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(255, 255, 252, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   color: var(--text);
   padding: 14px 16px;
   line-height: 1.4;
   cursor: pointer;
-  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
 }
 
 .option-button:hover:not(:disabled) {
-  border-color: #9eafa9;
-  background: #fbfcf8;
+  border-color: #86bfd4;
+  background: #f7fcff;
   transform: translateY(-1px);
+  box-shadow: 0 5px 13px rgba(24, 122, 165, 0.07);
 }
 
 .option-button:disabled {
@@ -344,13 +380,13 @@ main {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: #edf0ea;
-  color: #4b5a54;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
   font-weight: 800;
 }
 
 .option-button.correct {
-  border-color: #81b091;
+  border-color: #78b995;
   background: var(--success-soft);
 }
 
@@ -360,7 +396,7 @@ main {
 }
 
 .option-button.incorrect {
-  border-color: #cf9893;
+  border-color: #df9aa2;
   background: var(--danger-soft);
 }
 
@@ -393,12 +429,12 @@ main {
 
 .feedback-correct {
   background: var(--success-soft);
-  color: #315d43;
+  color: #286848;
 }
 
 .feedback-incorrect {
   background: var(--danger-soft);
-  color: #7e3d39;
+  color: #89343e;
 }
 
 .next-button {
@@ -436,7 +472,7 @@ main {
 }
 
 .error-card {
-  border-color: #d9a8a3;
+  border-color: #e5a5ab;
 }
 
 .site-footer {
@@ -449,8 +485,8 @@ main {
 
 @media (max-width: 560px) {
   body::before {
-    height: 215px;
-    background-size: 980px 215px;
+    height: 220px;
+    background-size: 1000px 220px;
   }
 
   .site-header {
@@ -462,7 +498,7 @@ main {
     font-size: 0.78rem;
     white-space: normal;
     text-align: right;
-    max-width: 125px;
+    max-width: 128px;
   }
 
   main {
@@ -475,9 +511,13 @@ main {
   }
 
   .question-card::before {
-    top: 14px;
-    right: 14px;
-    width: 34px;
+    top: 10px;
+    right: 9px;
+    width: 42px;
+  }
+
+  .question-text {
+    padding-right: 28px;
   }
 
   .option-button {
@@ -496,10 +536,18 @@ main {
     padding: 28px 22px;
   }
 
+  .hero::before {
+    width: 108px;
+    height: 72px;
+    right: 8px;
+    top: 8px;
+    opacity: 0.48;
+  }
+
   .hero::after {
-    width: 84px;
+    width: 88px;
     height: 44px;
-    right: 12px;
+    right: 10px;
     bottom: 12px;
   }
 }
