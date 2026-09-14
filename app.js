@@ -3,7 +3,6 @@
 
   const config = window.QUIZ_CONFIG;
   const questionBank = window.QUESTION_BANK;
-
   const app = document.querySelector("#app");
 
   if (!config || !Array.isArray(questionBank)) {
@@ -197,10 +196,26 @@
 
   function resultMessage(score, total) {
     const percentage = total ? score / total : 0;
-    if (percentage === 1) return "Full pott!";
-    if (percentage >= 0.8) return "Veldig bra!";
+    if (percentage === 1) return "Full pott! Kongeriket blomstrer.";
+    if (percentage >= 0.8) return "Veldig bra! En rik fangst og solid buskap.";
     if (percentage >= 0.6) return "Godt jobba – litt repetisjon til, så sitter det.";
     return "Her er det litt å repetere. Ta gjerne en ny runde.";
+  }
+
+  const rewards = {
+    vocabulary: { icon: "🐟", label: "fisk", title: "Ordforråd" },
+    det: { icon: "🐑", label: "sauer", title: "Det-setninger" },
+    v2: { icon: "🐄", label: "kuer", title: "V2" }
+  };
+
+  function rewardIcons(categoryId, count) {
+    const reward = rewards[categoryId];
+    if (!reward) return "";
+    if (count === 0) return `<span class="reward-empty">ingen ennå</span>`;
+
+    return Array.from({ length: count }, (_, index) =>
+      `<span class="reward-icon" aria-hidden="true" style="--i:${index}">${reward.icon}</span>`
+    ).join("");
   }
 
   function renderResults() {
@@ -210,15 +225,31 @@
     const categoryRows = enabledCategories()
       .map(([categoryId, categoryConfig]) => {
         const result = resultForCategory(categoryId);
-        const percent = result.total ? Math.round((result.correct / result.total) * 100) : 0;
         return `
           <div class="result-row">
-            <div>
-              <strong>${categoryConfig.label}</strong>
-              <span>${result.correct} av ${result.total}</span>
+            <strong>${categoryConfig.label}</strong>
+            <span>${result.correct} av ${result.total} riktige</span>
+          </div>`;
+      })
+      .join("");
+
+    const rewardCards = enabledCategories()
+      .map(([categoryId]) => {
+        const result = resultForCategory(categoryId);
+        const reward = rewards[categoryId];
+        if (!reward) return "";
+
+        return `
+          <div class="reward-card reward-${categoryId}">
+            <div class="reward-heading">
+              <span class="reward-big-icon" aria-hidden="true">${reward.icon}</span>
+              <div>
+                <strong>${reward.title}</strong>
+                <span>${result.correct} ${reward.label}</span>
+              </div>
             </div>
-            <div class="mini-track" aria-hidden="true">
-              <div class="mini-fill" style="width: ${percent}%"></div>
+            <div class="reward-pile" aria-label="${result.correct} av ${result.total} riktige i ${reward.title}">
+              ${rewardIcons(categoryId, result.correct)}
             </div>
           </div>`;
       })
@@ -230,8 +261,16 @@
         <h1>${score} av ${total}</h1>
         <p class="lead">${resultMessage(score, total)}</p>
 
-        <div class="result-list">
+        <div class="plain-results" aria-label="Resultat per kategori">
           ${categoryRows}
+        </div>
+
+        <div class="reward-section">
+          <h2>Dagens fangst og buskap</h2>
+          <p class="reward-intro">Ett dyr for hvert riktig svar.</p>
+          <div class="reward-grid">
+            ${rewardCards}
+          </div>
         </div>
 
         <button class="primary-button" id="restart-button" type="button">Ta en ny runde</button>
