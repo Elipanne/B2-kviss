@@ -35,6 +35,18 @@
       ],
       correctIndex: 1,
       feedback: "Når «På møtet» står først, kommer det finitte verbet «har» på plass 2, så subjektet «vi» og deretter «ikke»."
+    },
+    V212: {
+      subtype: "fronting",
+      prompt: "Jeg svarer vanligvis på e-post om morgenen.",
+      instruction: "Begynn setningen med «Om morgenen».",
+      options: [
+        "Om morgenen jeg svarer vanligvis på e-post.",
+        "Om morgenen svarer jeg vanligvis på e-post.",
+        "Om morgenen vanligvis svarer jeg på e-post."
+      ],
+      correctIndex: 1,
+      feedback: "Når «Om morgenen» står først, kommer det finitte verbet «svarer» på plass 2: Om morgenen svarer jeg vanligvis på e-post."
     }
   };
 
@@ -49,7 +61,8 @@
     V208: "På fredager",
     V209: "Tidligere",
     V210: "Neste uke",
-    V211: "Dessverre"
+    V211: "Dessverre",
+    V212: "Om morgenen"
   };
 
   window.QUESTION_BANK = window.QUESTION_BANK.map((question) => {
@@ -57,7 +70,7 @@
       ? { ...question, ...overrides[question.id] }
       : { ...question };
 
-    if (updated.category === "v2" && updated.subtype === "fronting" && v2Starts[updated.id]) {
+    if (updated.category === "v2" && v2Starts[updated.id]) {
       updated.instruction = `Begynn setningen med «${v2Starts[updated.id]}».`;
     }
 
