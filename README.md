@@ -4,13 +4,21 @@ En enkel, mobiltilpasset repetisjonskviss for deltakere på norskkurs B2.
 
 ## Slik fungerer en runde
 
-En runde består foreløpig av 20 spørsmål:
+En runde består av 20 spørsmål:
 
 - 10 ordforrådsspørsmål
-- 5 oppgaver med det-setninger
-- 5 V2-oppgaver
+- 10 grammatikkspørsmål
 
-Spørsmålene trekkes tilfeldig fra en større oppgavebank. Etter hvert svar får brukeren umiddelbar tilbakemelding og en kort forklaring. Til slutt vises samlet resultat og resultat per kategori.
+Grammatikkdelen trekker foreløpig:
+
+- 3 V2-oppgaver
+- 2 oppgaver med det-setninger
+- 2 oppgaver med plassering av `ikke`
+- 3 oppgaver med pragmatiske setningsadverbialer
+
+Spørsmålene trekkes tilfeldig fra en større oppgavebank. Etter hvert svar får brukeren umiddelbar tilbakemelding og en kort forklaring. Til slutt vises samlet resultat og resultat for de to hovedkategoriene Ordforråd og Grammatikk.
+
+I resultatvisningen gir hvert riktig ordforrådssvar én fisk, og hvert riktig grammatikksvar én sau.
 
 ## Filstruktur
 
@@ -18,21 +26,28 @@ Spørsmålene trekkes tilfeldig fra en større oppgavebank. Etter hvert svar få
 B2-kviss/
 ├── index.html
 ├── style.css
+├── result-overrides.css
 ├── app.js
 ├── data/
 │   ├── quiz-config.js
-│   └── questions.js
+│   ├── questions.js
+│   └── question-overrides.js
 └── README.md
 ```
 
 ### `data/questions.js`
 
-Her ligger selve oppgavebanken. Nye spørsmål kan legges til uten å endre spillkoden.
+Her ligger den opprinnelige oppgavebanken.
+
+### `data/question-overrides.js`
+
+Her ligger redaksjonelle rettinger og nyere spørsmål som er lagt til etter hvert som kurset utvikler seg. Fila lastes etter `questions.js`, slik at enkeltoppgaver kan justeres uten å endre den opprinnelige banken.
 
 Hver oppgave har blant annet:
 
 - `id`: unik ID
-- `category`: kategori, for eksempel `vocabulary`, `det` eller `v2`
+- `category`: hovedkategori, nå `vocabulary` eller `grammar`
+- `grammarType`: grammatisk undertype, for eksempel `v2`, `det`, `ikke` eller `setningsadverbial`
 - `subtype`: mer spesifikk oppgavetype
 - `prompt`: selve spørsmålet eller utgangssetningen
 - `instruction`: valgfri instruksjon
@@ -44,22 +59,22 @@ Hver oppgave har blant annet:
 
 ### `data/quiz-config.js`
 
-Her bestemmes hvilke kategorier som er aktive og hvor mange spørsmål fra hver kategori som skal trekkes i en runde.
+Her bestemmes hvilke hovedkategorier som er aktive, hvor mange spørsmål som skal trekkes og hvordan grammatikkdelen fordeles på undertyper.
 
 Eksempel:
 
 ```js
-vocabulary: {
-  label: "Ordforråd",
+grammar: {
+  label: "Grammatikk",
   enabled: true,
-  questionsPerRound: 10
+  questionsPerRound: 10,
+  subtypeCounts: {
+    v2: 3,
+    det: 2,
+    ikke: 2,
+    setningsadverbial: 3
+  }
 }
 ```
 
-Det gjør det enkelt å legge til nye kategorier senere. En ny kategori kan først legges inn med `enabled: false`, og skrus på når den skal tas i bruk.
-
-## Videre utvidelser
-
-Når nytt undervisningsmateriell er gjennomgått, kan oppgavebanken bygges ut med flere spørsmål og eventuelt nye kategorier uten at `app.js`, `index.html` eller designet må endres.
-
-Mulige framtidige kategorier kan være bindeord, leddsetninger, verbbøying, substantiv/adjektiv eller andre temaer fra kurset.
+Dermed kan nye grammatikktyper, for eksempel leddsetninger, senere legges inn ved å utvide oppgavebanken og justere fordelingen i konfigurasjonen.
