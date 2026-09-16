@@ -41,16 +41,43 @@
     const selected = [];
 
     for (const [categoryId, categoryConfig] of enabledCategories()) {
-      const available = questionBank.filter((question) => question.category === categoryId);
+      if (categoryConfig.subtypeCounts) {
+        const configuredTotal = Object.values(categoryConfig.subtypeCounts)
+          .reduce((sum, count) => sum + count, 0);
 
-      if (available.length < categoryConfig.questionsPerRound) {
-        throw new Error(
-          `For få oppgaver i kategorien «${categoryConfig.label}». ` +
-          `Trenger ${categoryConfig.questionsPerRound}, men fant ${available.length}.`
-        );
+        if (configuredTotal !== categoryConfig.questionsPerRound) {
+          throw new Error(
+            `Oppsettet for «${categoryConfig.label}» er inkonsistent: ` +
+            `${configuredTotal} undertype-spørsmål er satt opp, men questionsPerRound er ${categoryConfig.questionsPerRound}.`
+          );
+        }
+
+        for (const [subtypeId, count] of Object.entries(categoryConfig.subtypeCounts)) {
+          const available = questionBank.filter(
+            (question) => question.category === categoryId && question.grammarType === subtypeId
+          );
+
+          if (available.length < count) {
+            throw new Error(
+              `For få oppgaver av typen «${subtypeId}» i ${categoryConfig.label}. ` +
+              `Trenger ${count}, men fant ${available.length}.`
+            );
+          }
+
+          selected.push(...shuffle(available).slice(0, count));
+        }
+      } else {
+        const available = questionBank.filter((question) => question.category === categoryId);
+
+        if (available.length < categoryConfig.questionsPerRound) {
+          throw new Error(
+            `For få oppgaver i kategorien «${categoryConfig.label}». ` +
+            `Trenger ${categoryConfig.questionsPerRound}, men fant ${available.length}.`
+          );
+        }
+
+        selected.push(...shuffle(available).slice(0, categoryConfig.questionsPerRound));
       }
-
-      selected.push(...shuffle(available).slice(0, categoryConfig.questionsPerRound));
     }
 
     return selected;
@@ -151,6 +178,7 @@
     state.results.push({
       id: question.id,
       category: question.category,
+      grammarType: question.grammarType || null,
       correct: isCorrect
     });
 
@@ -203,10 +231,13 @@
   }
 
   const rewards = {
-    vocabulary: { icon: "🐟", label: "fisk", title: "Ordforråd" },
-    det: { icon: "🐑", label: "sauer", title: "Det-setninger" },
-    v2: { icon: "🐄", label: "kuer", title: "V2" }
+    vocabulary: { icon: "🐟", singular: "fisk", plural: "fisk", title: "Ordforråd" },
+    grammar: { icon: "🐑", singular: "sau", plural: "sauer", title: "Grammatikk" }
   };
+
+  function rewardLabel(reward, count) {
+    return count === 1 ? reward.singular : reward.plural;
+  }
 
   function rewardIcons(categoryId, count) {
     const reward = rewards[categoryId];
@@ -245,7 +276,7 @@
               <span class="reward-big-icon" aria-hidden="true">${reward.icon}</span>
               <div>
                 <strong>${reward.title}</strong>
-                <span>${result.correct} ${reward.label}</span>
+                <span>${result.correct} ${rewardLabel(reward, result.correct)}</span>
               </div>
             </div>
             <div class="reward-pile" aria-label="${result.correct} av ${result.total} riktige i ${reward.title}">
