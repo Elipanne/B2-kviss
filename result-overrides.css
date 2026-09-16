@@ -1,0 +1,13 @@
+.reward-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reward-grammar {
+  background: linear-gradient(180deg, #f5fbf7, #ffffff);
+}
+
+@media (max-width: 680px) {
+  .reward-grid {
+    grid-template-columns: 1fr;
+  }
+}
