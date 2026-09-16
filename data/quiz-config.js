@@ -7,15 +7,16 @@ window.QUIZ_CONFIG = {
       enabled: true,
       questionsPerRound: 10
     },
-    det: {
-      label: "Det-setninger",
+    grammar: {
+      label: "Grammatikk",
       enabled: true,
-      questionsPerRound: 5
-    },
-    v2: {
-      label: "V2",
-      enabled: true,
-      questionsPerRound: 5
+      questionsPerRound: 10,
+      subtypeCounts: {
+        v2: 3,
+        det: 2,
+        ikke: 2,
+        setningsadverbial: 3
+      }
     }
   }
 };
