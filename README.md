@@ -1,80 +1,60 @@
 # B2-kviss
 
-En enkel, mobiltilpasset repetisjonskviss for deltakere på norskkurs B2.
+En enkel, mobiltilpasset repetisjonsside for deltakere på norskkurs B2.
 
-## Slik fungerer en runde
+## Forsiden
 
-En runde består av 20 spørsmål:
+Nettsida har tre innganger:
 
-- 10 ordforrådsspørsmål
-- 10 grammatikkspørsmål
+1. **Tilfeldig kviss** – 20 spørsmål: 10 ordforråd + 10 grammatikk.
+2. **Ord og uttrykk** – alfabetisk, søkbar ordoversikt med temafiltre og filter for siste undervisning.
+3. **Grammatikk** – øving på hele grammatikkbanken i tilfeldig rekkefølge.
 
-Grammatikkdelen trekker foreløpig:
+## Oppgavebanken
 
-- 3 V2-oppgaver
-- 2 oppgaver med det-setninger
-- 2 oppgaver med plassering av `ikke`
-- 3 oppgaver med pragmatiske setningsadverbialer
-
-Spørsmålene trekkes tilfeldig fra en større oppgavebank. Etter hvert svar får brukeren umiddelbar tilbakemelding og en kort forklaring. Til slutt vises samlet resultat og resultat for de to hovedkategoriene Ordforråd og Grammatikk.
-
-I resultatvisningen gir hvert riktig ordforrådssvar én fisk, og hvert riktig grammatikksvar én sau.
-
-## Filstruktur
-
-```text
-B2-kviss/
-├── index.html
-├── style.css
-├── result-overrides.css
-├── app.js
-├── data/
-│   ├── quiz-config.js
-│   ├── questions.js
-│   └── question-overrides.js
-└── README.md
-```
-
-### `data/questions.js`
-
-Her ligger den opprinnelige oppgavebanken.
-
-### `data/question-overrides.js`
-
-Her ligger redaksjonelle rettinger og nyere spørsmål som er lagt til etter hvert som kurset utvikler seg. Fila lastes etter `questions.js`, slik at enkeltoppgaver kan justeres uten å endre den opprinnelige banken.
+Spørsmålene ligger i `data/` og lastes før `app.js`. Ordoversikten bruker de samme ordforrådsoppgavene som kvissen, slik at definisjonene ikke må vedlikeholdes i en egen liste.
 
 Hver oppgave har blant annet:
 
 - `id`: unik ID
-- `category`: hovedkategori, nå `vocabulary` eller `grammar`
-- `grammarType`: grammatisk undertype, for eksempel `v2`, `det`, `ikke` eller `setningsadverbial`
+- `category`: `vocabulary` eller `grammar`
 - `subtype`: mer spesifikk oppgavetype
+- `grammarType`: for grammatikk, for eksempel `v2`, `det`, `ikke` eller `setningsadverbial`
 - `prompt`: selve spørsmålet eller utgangssetningen
 - `instruction`: valgfri instruksjon
 - `options`: svaralternativer
 - `correctIndex`: indeks til riktig svar, der første alternativ er `0`
-- `feedback`: forklaring som vises etter svar
+- `feedback`: forklaring som vises etter svar; brukes også som definisjon i ordoversikten når `definition` ikke er satt
 - `source`: hvilket undervisningsmateriale oppgaven bygger på
-- `tags`: stikkord som kan brukes senere til filtrering
+- `tags`: brukes blant annet til filtrering i ordoversikten
 
-### `data/quiz-config.js`
+Ordoppgaver kan i tillegg få feltene `term`, `definition` og `example`. Hvis de ikke finnes, henter ordoversikten ordet fra anførselstegn i `prompt` og bruker `feedback` som forklaring.
 
-Her bestemmes hvilke hovedkategorier som er aktive, hvor mange spørsmål som skal trekkes og hvordan grammatikkdelen fordeles på undertyper.
+## Tilfeldig kviss
 
-Eksempel:
+Fordelingen styres i `data/quiz-config.js`. Kvissen består nå av:
 
-```js
-grammar: {
-  label: "Grammatikk",
-  enabled: true,
-  questionsPerRound: 10,
-  subtypeCounts: {
-    v2: 3,
-    det: 2,
-    ikke: 2,
-    setningsadverbial: 3
-  }
-}
-```
+- 10 ordforrådsspørsmål
+- 10 grammatikkspørsmål
 
-Dermed kan nye grammatikktyper, for eksempel leddsetninger, senere legges inn ved å utvide oppgavebanken og justere fordelingen i konfigurasjonen.
+Grammatikkdelen trekker et bestemt antall fra ulike undertyper. Dette kan endres uten å bygge om resten av sida.
+
+## Ord og uttrykk
+
+Ordoversikten kan:
+
+- søke i ord, definisjoner, kilder og tags
+- vise ordene alfabetisk
+- filtrere på arbeidsliv/studier, samfunn/historie, litteratur/sanger og uttrykk
+- finne siste undervisning automatisk fra datotagger som `18. september`
+
+## Resultater
+
+Resultatsida viser vanlig poengsum og gir ett symbol per riktig svar:
+
+- 🐟 ordforråd
+- 🐑 grammatikk
+
+## Videre utvidelser
+
+Nye ord og grammatikkoppgaver kan legges til fortløpende. Aktuelle senere utvidelser er flere grammatikkundertyper, eksempelsetninger i ordoversikten og øving på enkeltord direkte fra ordkortene.
