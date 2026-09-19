@@ -19,7 +19,17 @@
     currentIndex: 0,
     answered: false,
     selectedIndex: null,
-    results: []
+    results: [],
+    sessionKind: "quiz",
+    wordFilter: "all",
+    wordSearch: ""
+  };
+
+  const grammarTypeLabels = {
+    v2: "V2",
+    det: "det-setninger",
+    ikke: "plassering av ikke",
+    setningsadverbial: "setningsadverbialer"
   };
 
   const shuffle = (items) => {
@@ -30,6 +40,14 @@
     }
     return copy;
   };
+
+  const escapeHtml = (value) =>
+    String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
 
   const enabledCategories = () =>
     Object.entries(config.categories).filter(([, category]) => category.enabled);
@@ -87,27 +105,85 @@
     return config.categories[categoryId]?.label || categoryId;
   }
 
-  function startRound() {
+  function questionLabel(question) {
+    if (question.category === "grammar" && question.grammarType) {
+      return `Grammatikk · ${grammarTypeLabels[question.grammarType] || question.grammarType}`;
+    }
+    return categoryLabel(question.category);
+  }
+
+  function beginSession(round, kind) {
+    state.round = round;
+    state.currentIndex = 0;
+    state.answered = false;
+    state.selectedIndex = null;
+    state.results = [];
+    state.sessionKind = kind;
+    renderQuestion();
+  }
+
+  function startQuiz() {
     try {
-      state.round = buildRound();
-      state.currentIndex = 0;
-      state.answered = false;
-      state.selectedIndex = null;
-      state.results = [];
-      renderQuestion();
+      beginSession(buildRound(), "quiz");
     } catch (error) {
       renderError(error.message);
     }
   }
 
-  function renderStart() {
+  function startGrammarPractice() {
+    const grammarQuestions = questionBank.filter((question) => question.category === "grammar");
+    if (!grammarQuestions.length) {
+      renderError("Fant ingen grammatikkoppgaver i oppgavebanken.");
+      return;
+    }
+    beginSession(shuffle(grammarQuestions), "grammar");
+  }
+
+  function renderHome() {
+    const vocabularyCount = questionBank.filter((question) => question.category === "vocabulary").length;
+    const grammarCount = questionBank.filter((question) => question.category === "grammar").length;
+
+    app.innerHTML = `
+      <section class="hero card home-hero">
+        <p class="eyebrow">Norskkurs B2</p>
+        <h1>Repetisjon</h1>
+        <p class="lead">Ta en tilfeldig kviss, slå opp ord og uttrykk, eller jobb deg gjennom grammatikkbanken.</p>
+
+        <div class="home-actions">
+          <button class="home-action" id="home-quiz" type="button">
+            <span class="home-action-kicker">KVISS</span>
+            <strong>20 tilfeldige spørsmål</strong>
+            <span>10 ord + 10 grammatikk</span>
+          </button>
+
+          <button class="home-action" id="home-words" type="button">
+            <span class="home-action-kicker">ORD OG UTTRYKK</span>
+            <strong>Bla, søk og filtrer</strong>
+            <span>${vocabularyCount} oppføringer fra kurset</span>
+          </button>
+
+          <button class="home-action" id="home-grammar" type="button">
+            <span class="home-action-kicker">GRAMMATIKK</span>
+            <strong>Øv på hele banken</strong>
+            <span>${grammarCount} grammatikkoppgaver</span>
+          </button>
+        </div>
+      </section>`;
+
+    document.querySelector("#home-quiz").addEventListener("click", renderQuizIntro);
+    document.querySelector("#home-words").addEventListener("click", renderWordLibrary);
+    document.querySelector("#home-grammar").addEventListener("click", renderGrammarIntro);
+  }
+
+  function renderQuizIntro() {
     const categorySummary = enabledCategories()
       .map(([, category]) => `${category.questionsPerRound} ${category.label.toLowerCase()}`)
       .join(" + ");
 
     app.innerHTML = `
       <section class="hero card">
-        <p class="eyebrow">Norskkurs B2</p>
+        <button class="back-button" id="back-home" type="button">← Forsiden</button>
+        <p class="eyebrow">Tilfeldig kviss</p>
         <h1>${config.title}</h1>
         <p class="lead">${config.subtitle}</p>
         <div class="round-summary">
@@ -118,7 +194,225 @@
         <button class="primary-button" id="start-button" type="button">Start kvissen</button>
       </section>`;
 
-    document.querySelector("#start-button").addEventListener("click", startRound);
+    document.querySelector("#back-home").addEventListener("click", renderHome);
+    document.querySelector("#start-button").addEventListener("click", startQuiz);
+  }
+
+  function renderGrammarIntro() {
+    const grammarQuestions = questionBank.filter((question) => question.category === "grammar");
+    const counts = grammarQuestions.reduce((acc, question) => {
+      const type = question.grammarType || "annet";
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    const breakdown = Object.entries(counts)
+      .map(([type, count]) => `<span class="breakdown-chip">${escapeHtml(grammarTypeLabels[type] || type)}: ${count}</span>`)
+      .join("");
+
+    app.innerHTML = `
+      <section class="hero card">
+        <button class="back-button" id="back-home" type="button">← Forsiden</button>
+        <p class="eyebrow">Grammatikk</p>
+        <h1>Hele grammatikkbanken</h1>
+        <p class="lead">Her får du alle grammatikkoppgavene i tilfeldig rekkefølge.</p>
+        <div class="grammar-breakdown">${breakdown}</div>
+        <p class="muted">Totalt ${grammarQuestions.length} oppgaver.</p>
+        <button class="primary-button" id="start-grammar" type="button">Start grammatikkøkta</button>
+      </section>`;
+
+    document.querySelector("#back-home").addEventListener("click", renderHome);
+    document.querySelector("#start-grammar").addEventListener("click", startGrammarPractice);
+  }
+
+  function quotedParts(text) {
+    return [...String(text || "").matchAll(/«([^»]+)»/g)].map((match) => match[1]);
+  }
+
+  function wordTerm(question) {
+    if (question.term) return question.term;
+    const parts = quotedParts(question.prompt);
+    if (parts.length > 1 && /\seller\s/i.test(question.prompt)) {
+      return parts.join(" / ");
+    }
+    if (parts.length) return parts[parts.length - 1];
+    return question.prompt;
+  }
+
+  function wordDefinition(question) {
+    return question.definition || question.feedback || question.options?.[question.correctIndex] || "";
+  }
+
+  function lessonDateFromTag(tag) {
+    const months = {
+      januar: 1, februar: 2, mars: 3, april: 4, mai: 5, juni: 6,
+      juli: 7, august: 8, september: 9, oktober: 10, november: 11, desember: 12
+    };
+    const match = String(tag).trim().toLowerCase().match(/^(\d{1,2})\.\s*([a-zæøå]+)$/i);
+    if (!match || !months[match[2]]) return null;
+    return { day: Number(match[1]), month: months[match[2]], label: tag };
+  }
+
+  function latestLessonTag() {
+    const candidates = questionBank
+      .filter((question) => question.category === "vocabulary")
+      .flatMap((question) => question.tags || [])
+      .map(lessonDateFromTag)
+      .filter(Boolean)
+      .sort((a, b) => (b.month - a.month) || (b.day - a.day));
+    return candidates[0]?.label || null;
+  }
+
+  function tagsFor(question) {
+    return (question.tags || []).map((tag) => String(tag).toLowerCase());
+  }
+
+  function matchesWordTheme(question, filterId, newestTag) {
+    if (filterId === "all") return true;
+
+    const tags = tagsFor(question);
+    const source = String(question.source || "").toLowerCase();
+
+    if (filterId === "latest") {
+      return newestTag ? tags.includes(String(newestTag).toLowerCase()) : false;
+    }
+
+    if (filterId === "work") {
+      return tags.some((tag) => ["arbeidsliv", "universitet", "utdanning", "møte", "arbeid", "skole", "undervisning"].includes(tag)) ||
+        source.includes("kursordforråd");
+    }
+
+    if (filterId === "society") {
+      return tags.some((tag) => tag.includes("samfunn") || tag.includes("historie") || tag.includes("monarki") || tag.includes("politikk"));
+    }
+
+    if (filterId === "literature") {
+      return tags.some((tag) => ["litteratur", "sang", "ola tveiten"].includes(tag)) ||
+        source.includes("skolegutt") || source.includes("ola tveiten") || source.includes("livet er for kjipt");
+    }
+
+    if (filterId === "expressions") {
+      return tags.some((tag) => ["uttrykk", "slang", "muntlig språk", "betydning i kontekst"].includes(tag));
+    }
+
+    return true;
+  }
+
+  function wordMatchesSearch(question, search) {
+    if (!search) return true;
+    const haystack = [
+      wordTerm(question),
+      wordDefinition(question),
+      question.source || "",
+      ...(question.tags || [])
+    ].join(" ").toLocaleLowerCase("nb-NO");
+
+    return haystack.includes(search.toLocaleLowerCase("nb-NO"));
+  }
+
+  function renderWordLibrary() {
+    const newestTag = latestLessonTag();
+    const latestLabel = newestTag ? `Siste undervisning (${newestTag})` : "Siste undervisning";
+
+    app.innerHTML = `
+      <section class="word-library">
+        <div class="library-heading card">
+          <button class="back-button" id="back-home" type="button">← Forsiden</button>
+          <p class="eyebrow">Oppslagsverk</p>
+          <h1>Ord og uttrykk</h1>
+          <p class="lead">Søk etter et ord, eller bla alfabetisk gjennom ordforrådet fra kurset.</p>
+
+          <label class="word-search-label" for="word-search">Søk</label>
+          <input class="word-search" id="word-search" type="search" placeholder="Søk etter ord, betydning eller tema …" autocomplete="off">
+
+          <div class="word-filters" role="group" aria-label="Filtrer ord etter tema">
+            <button class="filter-chip active" data-filter="all" type="button">Alle</button>
+            <button class="filter-chip" data-filter="latest" type="button">${escapeHtml(latestLabel)}</button>
+            <button class="filter-chip" data-filter="work" type="button">Arbeidsliv & studier</button>
+            <button class="filter-chip" data-filter="society" type="button">Samfunn & historie</button>
+            <button class="filter-chip" data-filter="literature" type="button">Litteratur & sanger</button>
+            <button class="filter-chip" data-filter="expressions" type="button">Uttrykk</button>
+          </div>
+
+          <p class="word-count" id="word-count"></p>
+        </div>
+
+        <div id="word-list"></div>
+      </section>`;
+
+    state.wordFilter = "all";
+    state.wordSearch = "";
+
+    document.querySelector("#back-home").addEventListener("click", renderHome);
+    document.querySelector("#word-search").addEventListener("input", (event) => {
+      state.wordSearch = event.target.value.trim();
+      updateWordList();
+    });
+
+    document.querySelectorAll(".filter-chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.wordFilter = button.dataset.filter;
+        document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("active"));
+        button.classList.add("active");
+        updateWordList();
+      });
+    });
+
+    updateWordList();
+  }
+
+  function updateWordList() {
+    const newestTag = latestLessonTag();
+    const words = questionBank
+      .filter((question) => question.category === "vocabulary")
+      .filter((question) => matchesWordTheme(question, state.wordFilter, newestTag))
+      .filter((question) => wordMatchesSearch(question, state.wordSearch))
+      .sort((a, b) => wordTerm(a).localeCompare(wordTerm(b), "nb", { sensitivity: "base" }));
+
+    const countNode = document.querySelector("#word-count");
+    const listNode = document.querySelector("#word-list");
+    if (!countNode || !listNode) return;
+
+    countNode.textContent = `${words.length} ${words.length === 1 ? "oppføring" : "oppføringer"}`;
+
+    if (!words.length) {
+      listNode.innerHTML = `
+        <div class="card empty-word-state">
+          <strong>Ingen treff</strong>
+          <p>Prøv et annet søkeord eller velg et annet filter.</p>
+        </div>`;
+      return;
+    }
+
+    const groups = new Map();
+    for (const question of words) {
+      const term = wordTerm(question);
+      const first = term.trim().charAt(0).toLocaleUpperCase("nb-NO") || "#";
+      if (!groups.has(first)) groups.set(first, []);
+      groups.get(first).push(question);
+    }
+
+    listNode.innerHTML = [...groups.entries()].map(([letter, questions]) => `
+      <section class="word-letter-section" aria-labelledby="letter-${escapeHtml(letter)}">
+        <h2 class="word-letter" id="letter-${escapeHtml(letter)}">${escapeHtml(letter)}</h2>
+        <div class="word-grid">
+          ${questions.map((question) => {
+            const example = question.example
+              ? `<p class="word-example"><span>Eksempel:</span> ${escapeHtml(question.example)}</p>`
+              : "";
+            const source = question.source
+              ? `<p class="word-source">Fra: ${escapeHtml(question.source)}</p>`
+              : "";
+            return `
+              <article class="word-card card">
+                <h3>${escapeHtml(wordTerm(question))}</h3>
+                <p class="word-definition">${escapeHtml(wordDefinition(question))}</p>
+                ${example}
+                ${source}
+              </article>`;
+          }).join("")}
+        </div>
+      </section>`).join("");
   }
 
   function renderQuestion() {
@@ -129,8 +423,9 @@
 
     app.innerHTML = `
       <section class="quiz-shell">
+        <button class="back-button compact-back" id="session-home" type="button">← Forsiden</button>
         <div class="topline">
-          <span class="category-badge">${categoryLabel(question.category)}</span>
+          <span class="category-badge">${escapeHtml(questionLabel(question))}</span>
           <span class="counter">${number} / ${total}</span>
         </div>
 
@@ -139,8 +434,8 @@
         </div>
 
         <article class="card question-card">
-          <h1 class="question-text">${question.prompt}</h1>
-          ${question.instruction ? `<p class="instruction">${question.instruction}</p>` : ""}
+          <h1 class="question-text">${escapeHtml(question.prompt)}</h1>
+          ${question.instruction ? `<p class="instruction">${escapeHtml(question.instruction)}</p>` : ""}
 
           <div class="options" role="group" aria-label="Svaralternativer">
             ${question.options
@@ -148,7 +443,7 @@
                 (option, index) => `
                   <button class="option-button" type="button" data-index="${index}">
                     <span class="option-letter">${String.fromCharCode(65 + index)}</span>
-                    <span>${option}</span>
+                    <span>${escapeHtml(option)}</span>
                   </button>`
               )
               .join("")}
@@ -161,6 +456,7 @@
         </article>
       </section>`;
 
+    document.querySelector("#session-home").addEventListener("click", renderHome);
     document.querySelectorAll(".option-button").forEach((button) => {
       button.addEventListener("click", () => answerQuestion(Number(button.dataset.index)));
     });
@@ -193,7 +489,7 @@
     feedback.className = `feedback ${isCorrect ? "feedback-correct" : "feedback-incorrect"}`;
     feedback.innerHTML = `
       <strong>${isCorrect ? "Riktig!" : "Ikke helt."}</strong>
-      <span>${question.feedback}</span>`;
+      <span>${escapeHtml(question.feedback)}</span>`;
 
     const nextButton = document.querySelector("#next-button");
     nextButton.classList.remove("hidden");
@@ -252,20 +548,22 @@
   function renderResults() {
     const total = state.results.length;
     const score = state.results.filter((result) => result.correct).length;
+    const resultCategories = ["vocabulary", "grammar"]
+      .filter((categoryId) => state.results.some((result) => result.category === categoryId));
 
-    const categoryRows = enabledCategories()
-      .map(([categoryId, categoryConfig]) => {
+    const categoryRows = resultCategories
+      .map((categoryId) => {
         const result = resultForCategory(categoryId);
         return `
           <div class="result-row">
-            <strong>${categoryConfig.label}</strong>
+            <strong>${escapeHtml(categoryLabel(categoryId))}</strong>
             <span>${result.correct} av ${result.total} riktige</span>
           </div>`;
       })
       .join("");
 
-    const rewardCards = enabledCategories()
-      .map(([categoryId]) => {
+    const rewardCards = resultCategories
+      .map((categoryId) => {
         const result = resultForCategory(categoryId);
         const reward = rewards[categoryId];
         if (!reward) return "";
@@ -286,6 +584,10 @@
       })
       .join("");
 
+    const restartLabel = state.sessionKind === "grammar"
+      ? "Ta grammatikkbanken på nytt"
+      : "Ta en ny kviss";
+
     app.innerHTML = `
       <section class="card result-card">
         <p class="eyebrow">Ferdig</p>
@@ -304,19 +606,28 @@
           </div>
         </div>
 
-        <button class="primary-button" id="restart-button" type="button">Ta en ny runde</button>
+        <div class="result-actions">
+          <button class="primary-button" id="restart-button" type="button">${restartLabel}</button>
+          <button class="secondary-button" id="result-home" type="button">Til forsiden</button>
+        </div>
       </section>`;
 
-    document.querySelector("#restart-button").addEventListener("click", startRound);
+    document.querySelector("#restart-button").addEventListener("click", () => {
+      if (state.sessionKind === "grammar") startGrammarPractice();
+      else startQuiz();
+    });
+    document.querySelector("#result-home").addEventListener("click", renderHome);
   }
 
   function renderError(message) {
     app.innerHTML = `
       <section class="card error-card">
         <h1>Noe gikk galt</h1>
-        <p>${message}</p>
+        <p>${escapeHtml(message)}</p>
+        <button class="secondary-button" id="error-home" type="button">Til forsiden</button>
       </section>`;
+    document.querySelector("#error-home").addEventListener("click", renderHome);
   }
 
-  renderStart();
+  renderHome();
 })();
