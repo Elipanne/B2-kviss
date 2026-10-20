@@ -29,7 +29,8 @@
     v2: "V2",
     det: "det-setninger",
     ikke: "plassering av ikke",
-    setningsadverbial: "setningsadverbialer"
+    setningsadverbial: "setningsadverbialer",
+    possessive: "sin / si / sitt / sine"
   };
 
   const shuffle = (items) => {
