@@ -12,10 +12,11 @@ window.QUIZ_CONFIG = {
       enabled: true,
       questionsPerRound: 10,
       subtypeCounts: {
-        v2: 3,
+        v2: 2,
         det: 2,
         ikke: 2,
-        setningsadverbial: 3
+        setningsadverbial: 2,
+        possessive: 2
       }
     }
   }
