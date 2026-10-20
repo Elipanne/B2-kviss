@@ -8,21 +8,35 @@
   if (nedsnodd) {
     Object.assign(nedsnodd, {
       term: "nedsnødd",
-      definition: "dekket av mye snø; overført: overveldet av svært mye arbeid, e-post, oppgaver eller lignende",
+      definition: "1) dekket eller nesten begravd av mye snø; 2) overført: overveldet av svært mye arbeid, e-post, oppgaver eller lignende; 3) overført, muntlig: dårlig orientert, utenfor eller lite oppdatert på et område",
       prompt: "Hva kan «nedsnødd» bety?",
       options: [
-        "Både dekket av mye snø og, overført, overveldet av svært mye arbeid eller andre oppgaver",
-        "Bare at noe har fryst fast i bakken",
-        "At man har ryddet bort all snøen"
+        "Det kan bety dekket av mye snø, overveldet av mye arbeid, eller muntlig dårlig orientert og lite oppdatert på et område",
+        "Det betyr bare at noe har fryst fast i bakken",
+        "Det betyr alltid at man har svært god oversikt"
       ],
       correctIndex: 0,
-      feedback: "«Nedsnødd» kan brukes konkret om noe som er dekket av mye snø. Overført kan man for eksempel være «nedsnødd i jobb» når man har svært mye å gjøre.",
+      feedback: "«Nedsnødd» kan brukes konkret om noe som er dekket av mye snø. Overført kan man være «nedsnødd i jobb» når man har svært mye å gjøre. Muntlig kan det også bety dårlig orientert, utenfor eller lite oppdatert, for eksempel «jeg er helt nedsnødd teknologisk».",
       source: "Snø og vintervær",
       tags: ["16. oktober", "20. oktober", "vinter", "vær", "uttrykk", "overført betydning"]
     });
   }
 
   const newQuestions = [
+    {
+      id: "OCT20ORD07", category: "vocabulary", subtype: "meaning-in-context",
+      term: "nedsnødd (overført)",
+      definition: "overført og muntlig: dårlig orientert, utenfor eller lite oppdatert på et område",
+      prompt: "«Jeg er helt nedsnødd teknologisk.» Hva betyr «nedsnødd» her?",
+      options: [
+        "At personen er dårlig orientert eller lite oppdatert på teknologi",
+        "At personen har svært mye teknologisk utstyr",
+        "At personen jobber ute i snøen"
+      ],
+      correctIndex: 0,
+      feedback: "Her brukes «nedsnødd» muntlig og overført om å være dårlig orientert, utenfor eller lite oppdatert på et område.",
+      source: "B2 20. oktober", tags: ["20. oktober", "uttrykk", "muntlig språk", "overført betydning"]
+    },
     {
       id: "OCT20ORD01", category: "vocabulary", subtype: "meaning",
       term: "å være på jordet",
